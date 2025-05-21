@@ -36,17 +36,27 @@ def gerar_permutacoes(itens):
 def get_distancia(cache, ponto_x, ponto_y):
     return 0 if ponto_x == ponto_y else cache.get((ponto_x, ponto_y)) or cache.get((ponto_y, ponto_x))
 
-def encontrar_rota_otima(pontos, cache):
-    entregas = [p for p in pontos if p != 'R']
-    melhor, menor = None, float('inf')
+def encontrar_rota_otima(pontos, cache_distancias):
+    pontos_entrega = [p for p in pontos.keys() if p != 'R']
+    origem = 'R'
+    menor_distancia = float('inf')
+    melhor_rota = None
+    
+    for permutacao in gerar_permutacoes(pontos_entrega):
+        distancia_atual = 0
+        ponto_atual = origem
+        
+        for ponto in permutacao:
+            distancia_atual += get_distancia(cache_distancias, ponto_atual, ponto)
+            ponto_atual = ponto
 
-    for perm in gerar_permutacoes(entregas):
-        rota = ['R'] + perm + ['R']
-        dist = sum(get_distancia(cache, rota[i], rota[i + 1]) for i in range(len(rota) - 1))
-        if dist < menor:
-            melhor, menor = perm, dist
-
-    return ' '.join(melhor)
+        distancia_atual += get_distancia(cache_distancias, ponto_atual, origem)
+        
+        if distancia_atual < menor_distancia:
+            menor_distancia = distancia_atual
+            melhor_rota = permutacao
+    
+    return ' '.join(melhor_rota)
 
 def main():
     caminho_arquivo = 'matriz.txt'
