@@ -10,31 +10,13 @@ def ler_matriz(caminho_arquivo):
         return pontos
 
 def precalcular_distancias(pontos):
-
-    def calcular_distancia(a, b):
-        return abs(a[0] - b[0]) + abs(a[1] - b[1])
-    
-    pontos_entrega = [p for p in pontos.keys() if p != 'R']
-    todos_pontos = pontos_entrega + ['R']
-    cache_distancias = {}
-    
-    for i in range(len(todos_pontos)):
-        for j in range(i+1, len(todos_pontos)):
-            ponto_origem = todos_pontos[i]
-            ponto_destino = todos_pontos[j]
-            distancia = calcular_distancia(pontos[ponto_origem], pontos[ponto_destino])
-            cache_distancias[(ponto_origem, ponto_destino)] = distancia
-
-    return cache_distancias
-
-def get_distancia(cache_distancias, ponto_origem, ponto_destino):
-    if ponto_origem == ponto_destino:
-        return 0
-    distancia = cache_distancias.get((ponto_origem, ponto_destino))
-    if distancia is None:
-        distancia = cache_distancias.get((ponto_destino, ponto_origem))
-
-    return distancia
+    calc = lambda a, b: abs(a[0] - b[0]) + abs(a[1] - b[1])
+    chaves = list(pontos)
+    return {
+        (a, b): calc(pontos[a], pontos[b])
+        for i, a in enumerate(chaves)
+        for b in chaves[i + 1:]
+    }
 
 def gerar_permutacoes(itens):
     if len(itens) == 0:
@@ -51,33 +33,26 @@ def gerar_permutacoes(itens):
     
     return permutacoes
 
-def encontrar_rota_otima(pontos, cache_distancias):
-    pontos_entrega = [p for p in pontos.keys() if p != 'R']
-    origem = 'R'
-    menor_distancia = float('inf')
-    melhor_rota = None
-    
-    for permutacao in gerar_permutacoes(pontos_entrega):
-        distancia_atual = 0
-        ponto_atual = origem
-        
-        for ponto in permutacao:
-            distancia_atual += get_distancia(cache_distancias, ponto_atual, ponto)
-            ponto_atual = ponto
+def get_distancia(cache, ponto_origem, ponto_destino):
+    return 0 if ponto_origem == ponto_destino else cache.get((ponto_origem, ponto_destino)) or cache.get((ponto_destino, ponto_origem))
 
-        distancia_atual += get_distancia(cache_distancias, ponto_atual, origem)
-        
-        if distancia_atual < menor_distancia:
-            menor_distancia = distancia_atual
-            melhor_rota = permutacao
-    
-    return ' '.join(melhor_rota)
+def encontrar_rota_otima(pontos, cache):
+    entregas = [p for p in pontos if p != 'R']
+    melhor, menor = None, float('inf')
+
+    for perm in gerar_permutacoes(entregas):
+        rota = ['R'] + perm + ['R']
+        dist = sum(get_distancia(cache, rota[i], rota[i + 1]) for i in range(len(rota) - 1))
+        if dist < menor:
+            melhor, menor = perm, dist
+
+    return ' '.join(melhor)
 
 def main():
     caminho_arquivo = 'matriz.txt'
     pontos = ler_matriz(caminho_arquivo)
-    cache_distancias = precalcular_distancias(pontos)
-    rota_otima = encontrar_rota_otima(pontos, cache_distancias)
+    cache = precalcular_distancias(pontos)
+    rota_otima = encontrar_rota_otima(pontos, cache)
     print(rota_otima)
     
 if __name__ == "__main__":
