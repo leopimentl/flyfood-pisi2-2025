@@ -33,8 +33,8 @@ def gerar_permutacoes(itens):
     
     return permutacoes
 
-def get_distancia(cache, ponto_origem, ponto_destino):
-    return 0 if ponto_origem == ponto_destino else cache.get((ponto_origem, ponto_destino)) or cache.get((ponto_destino, ponto_origem))
+def get_distancia(cache, ponto_x, ponto_y):
+    return 0 if ponto_x == ponto_y else cache.get((ponto_x, ponto_y)) or cache.get((ponto_y, ponto_x))
 
 def encontrar_rota_otima(pontos, cache):
     entregas = [p for p in pontos if p != 'R']
