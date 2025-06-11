@@ -1,5 +1,39 @@
-import time
+from matplotlib import pyplot as plt
 
+def plotar_rota(pontos, rota_str):
+    coords = [pontos['R']] + [pontos[letra] for letra in rota_str.split()] + [pontos['R']]
+    fig, ax = plt.subplots()
+
+    linhas = max(coord[0] for coord in pontos.values()) + 1
+    colunas = max(coord[1] for coord in pontos.values()) + 1
+    for i in range(linhas):
+        ax.axhline(i, color='lightgray', linewidth=0.5)
+    for j in range(colunas):
+        ax.axvline(j, color='lightgray', linewidth=0.5)
+ 
+    for label, (x, y) in pontos.items():
+        ax.plot(y + 0.5, linhas - x - 0.5, 'o', markersize=10)
+        ax.text(y + 0.5, linhas - x - 0.5, label, ha='center', va='center', color='white', bbox=dict(facecolor='black', boxstyle='circle'))
+
+    for i in range(len(coords) - 1):
+        x1, y1 = coords[i]
+        x2, y2 = coords[i + 1]
+        
+        path = [
+            (y1 + 0.5, linhas - x1 - 0.5),
+            (y2 + 0.5, linhas - x1 - 0.5),
+            (y2 + 0.5, linhas - x2 - 0.5)
+        ]
+        ax.plot(*zip(*path), color='blue')
+
+    ax.set_aspect('equal')
+    ax.set_xticks(range(colunas))
+    ax.set_yticks(range(linhas))
+    ax.set_xlim(0, colunas)
+    ax.set_ylim(0, linhas)
+    ax.invert_yaxis()
+    plt.grid(True)
+    plt.show()
 
 def ler_matriz(caminho_arquivo):
     with open(caminho_arquivo) as c:
@@ -65,12 +99,9 @@ def main():
     caminho_arquivo = 'matriz10x10_10p.txt'
     pontos = ler_matriz(caminho_arquivo)
     cache = precalcular_distancias(pontos)
-    inicio = time.time()
     rota_otima = encontrar_rota_otima(pontos, cache)
-    fim = time.time()
-
     print(rota_otima)
-    print(f"Tempo de execução: {fim - inicio:.6f} segundos")
-    
+    plotar_rota(pontos, rota_otima)
+
 if __name__ == "__main__":
     main()
