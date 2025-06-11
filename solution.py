@@ -1,3 +1,6 @@
+import time
+
+
 def ler_matriz(caminho_arquivo):
     with open(caminho_arquivo) as c:
         linhas, colunas = [int(x) for x in c.readline().split()]
@@ -62,8 +65,12 @@ def main():
     caminho_arquivo = 'matriz.txt'
     pontos = ler_matriz(caminho_arquivo)
     cache = precalcular_distancias(pontos)
+    inicio = time.time()
     rota_otima = encontrar_rota_otima(pontos, cache)
+    fim = time.time()
+
     print(rota_otima)
+    print(f"Tempo de execução: {fim - inicio:.6f} segundos")
     
 if __name__ == "__main__":
     main()
