@@ -62,7 +62,7 @@ def encontrar_rota_otima(pontos, cache_distancias):
     return ' '.join(melhor_rota)
 
 def main():
-    caminho_arquivo = 'matriz.txt'
+    caminho_arquivo = 'matriz11x11_11p.txt'
     pontos = ler_matriz(caminho_arquivo)
     cache = precalcular_distancias(pontos)
     inicio = time.time()
